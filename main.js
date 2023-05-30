@@ -3,6 +3,7 @@
 var path = require('path');
 const fileDisplay = require("./fileDisplay");
 const checkFile = require("./checkFile");
+const transToHongKong = require("./transToHongKong");
 const argv = process.argv.slice(2);
 const package = require("./package.json")
 // 版本号
@@ -11,8 +12,20 @@ if (argv[0] === '-v' || argv[0] === '-V') {
 }
 // 帮助说明
 if (argv[0] === '--help' || argv[0] === '-help') {
+    console.log('\x1b[32m1、抽取目标路径文件内容中文：\x1b[0m');
+    console.log('\x1b[32m```\x1b[0m');
     console.log('\x1b[1m\x1b[32mhxread [读取文件的路径] [输出的文件名] [支持读取文件的后缀]\x1b[0m');
+    console.log('\x1b[32m```\x1b[0m');
+    console.log('\x1b[32m2、读目标路径文件内容中文是否使用国际化文件中的对象：\x1b[0m');
+    console.log('\x1b[32m```\x1b[0m');
+    console.log('\x1b[1m\x1b[32mhxread [读取文件的路径] [国际化文件的路径] [输出的文件名] [支持读取文件的后缀]\x1b[0m');
+    console.log('\x1b[32m```\x1b[0m');
+    console.log('\x1b[32m3、目标路径下的文件内容中文转换成香港繁体字：\x1b[0m');
+    console.log('\x1b[32m```\x1b[0m');
+    console.log('\x1b[1m\x1b[32mhxread --hk [读取文件的路径] [支持读取文件的后缀]\x1b[0m');
+    console.log('\x1b[32m```\x1b[0m');
     console.log('\x1b[32m读取文件的路径: 会遍历递归读取路径上的所有文件\x1b[0m');
+    console.log('\x1b[32m国际化文件的路径，国际化一般就是导出一个对象，可为json文件或js文件，js文件需要module.exports导出\x1b[0m');
     console.log('\x1b[32m输出的文件名: 会在执行指令的所在目录下输出生成文件，文件名默认为 output.txt\x1b[0m');
     return console.log('\x1b[32m支持读取文件的后缀: 不填会默认读取所有文件，填了则默认只读取支持读取文件的后缀的文件，用逗号分割符隔开，例: html,js ，这样就只会读取html和js文件\x1b[0m');
 }
@@ -35,6 +48,12 @@ if (isPath(argv[0])) {
         }
         fileDisplay(filePath, argv[1], includeSuffix)
     }
+} else if (argv[0] === '--hk') {
+    let includeSuffix = null;
+    if (argv[2]) {
+        includeSuffix = argv[2].split(",")
+    }
+    transToHongKong(argv[1], includeSuffix)
 } else {
     console.log("Please enter the correct path");
 }

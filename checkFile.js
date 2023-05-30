@@ -26,7 +26,7 @@ function getAllKeys(obj) {
 }
 
 // 迭代生成新对象
-function generateObject(arr) {
+function generateObject(arr, targetObj) {
   let obj = {};
   arr.forEach((item) => {
     let keys = item.split(".");
@@ -56,45 +56,7 @@ function readValue(arr, obj = targetObj) {
 }
 
 
-// 读取文件内容
-function readFile(file) {
-  return new Promise(res => {
-    fs.readFile(file, "utf8", async function (err, data) {
-      if (err)
-        console.log("读取文件fail " + err);
-      else {
-        let fileContent = "";
-        if (file.indexOf(".html") > -1) {
-          // html文件去除注释
-          fileContent = data.replace(/<!--(.*?)-->/g, '');
-        } else if (file.indexOf(".json") > -1) {
-          fileContent = data;
-        } else if (file.indexOf(".js") > -1) {
-          // js文件去除注释
-          const minifiedJs = uglify.minify(data, {
-            output: {
-              comments: false
-            }
-          });
-          fileContent = minifiedJs.code;
-        } else {
-          fileContent = data;
-        }
-        keysArr.forEach(key => {
-          // 若有使用到
-          if (fileContent && fileContent.includes(key)) {
-            newkeysArr.push(key)
-          }
-        })
-        // 已经确定使用的就去掉检测
-        keysArr = keysArr.filter(key => {
-          return !newkeysArr.includes(key)
-        })
-      }
-      res()
-    });
-  })
-}
+
 
 // 写入文件内容
 function writeFile(str, file) {
@@ -120,10 +82,10 @@ function writeFile(str, file) {
  * @date 30/05/2023
  * @param {*} filePath 目标文件路径
  * @param {*} targetObj 国际化对象
- * @param {*} fileName 文件名称+后缀
+ * @param {*} outputName 文件名称+后缀
  * @param {*} includeSuffix 包括的文件类型
  */
-function checkFile(filePath, targetObj, fileName, includeSuffix) {
+function checkFile(filePath, targetObj, outputName, includeSuffix) {
   let numIndex = 0;
   let keysArr = getAllKeys(targetObj); // 目标对象的所有key
   fileDisplay(filePath); // 读取路径下的文件
@@ -160,14 +122,14 @@ function checkFile(filePath, targetObj, fileName, includeSuffix) {
                     if (targetSuffix === suffix) {
                       await readFile(filedir, outputName)
                       numIndex++;
-                      console.log(`读取文件中${numIndex}...`);
+                      console.log(`校验文件${numIndex}...`);
                       isDone = false;
                     }
                   }
                 } else {
                   await readFile(filedir, outputName)
                   numIndex++;
-                  console.log(`读取文件中${numIndex}...`);
+                  console.log(`校验文件${numIndex}...`);
                   isDone = false;
                 }
               }
@@ -195,16 +157,55 @@ function checkFile(filePath, targetObj, fileName, includeSuffix) {
           newValuesArr.push(val)
         }
       })
-      const newObj = generateObject(newkeysArr); // 读取路径下的文件使用到的新对象
-      writeFile("未使用：" + os.EOL + JSON.stringify(nousekeysArr) + os.EOL, fileName);
-      writeFile("使用：" + os.EOL + JSON.stringify(newkeysArr) + os.EOL, fileName);
-      writeFile("新对象：" + os.EOL + JSON.stringify(newObj), fileName);
-      writeFile("使用的value值：" + os.EOL + JSON.stringify(newValuesArr), fileName);
+      const newObj = generateObject(newkeysArr, targetObj); // 读取路径下的文件使用到的新对象
+      writeFile("未使用：" + os.EOL + JSON.stringify(nousekeysArr) + os.EOL, outputName);
+      writeFile("已使用：" + os.EOL + JSON.stringify(newkeysArr) + os.EOL, outputName);
+      writeFile("已使用的国际化新对象：" + os.EOL + JSON.stringify(newObj) + os.EOL, outputName);
+      writeFile("已使用的value值：" + os.EOL + JSON.stringify(newValuesArr) + os.EOL, outputName);
     } else if (timer) {
       clearTimeout(timer)
       timer = setTimeout(timeExcute, 5 * 1000)
     }
     isDone = true;
+  }
+  // 读取文件内容
+  function readFile(file) {
+    return new Promise(res => {
+      fs.readFile(file, "utf8", async function (err, data) {
+        if (err)
+          console.log("读取文件fail " + err);
+        else {
+          let fileContent = "";
+          if (file.indexOf(".html") > -1) {
+            // html文件去除注释
+            fileContent = data.replace(/<!--(.*?)-->/g, '');
+          } else if (file.indexOf(".json") > -1) {
+            fileContent = data;
+          } else if (file.indexOf(".js") > -1) {
+            // js文件去除注释
+            const minifiedJs = uglify.minify(data, {
+              output: {
+                comments: false
+              }
+            });
+            fileContent = minifiedJs.code;
+          } else {
+            fileContent = data;
+          }
+          keysArr.forEach(key => {
+            // 若有使用到
+            if (fileContent && fileContent.includes(key)) {
+              newkeysArr.push(key)
+            }
+          })
+          // 已经确定使用的就去掉检测
+          keysArr = keysArr.filter(key => {
+            return !newkeysArr.includes(key)
+          })
+        }
+        res()
+      });
+    })
   }
 }
 

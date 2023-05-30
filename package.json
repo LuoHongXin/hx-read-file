@@ -1,6 +1,6 @@
 {
   "name": "hxread",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "国际化时相关的脚本",
   "main": "main.js",
   "bin": {
@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "iconv-lite": "^0.6.3",
+    "node-opencc": "^2.0.1",
     "uglify-js": "^3.17.4"
   }
 }

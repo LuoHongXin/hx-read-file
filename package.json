@@ -9,6 +9,8 @@
   "files": [
     "readme.md",
     "fileDisplay.js",
+    "checkFile.js",
+    "transToHongKong.js",
     "main.js"
   ],
   "scripts": {

@@ -88,12 +88,10 @@ function readFile(file, filename) {
                     newArr.forEach(str => {
                         fileStr = fileStr + os.EOL + str;
                         var reg = new RegExp(str, 'ig');
-                        console.log(str, OpenCC.simplifiedToHongKong(str), 444);
                         data = data.replace(reg, OpenCC.simplifiedToHongKong(str))
                     })
                     if (fileStr) {
                         // 含有中文的写入读取的文件地址
-                        console.log(data, 8888);
                         await writeFile(data, filename)
                     } else {
                         res()

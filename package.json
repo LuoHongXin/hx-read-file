@@ -21,6 +21,7 @@
     "url": "git@github.com:LuoHongXin/hx-read-file.git"
   },
   "dependencies": {
-    "iconv-lite": "^0.6.3"
+    "iconv-lite": "^0.6.3",
+    "uglify-js": "^3.17.4"
   }
 }

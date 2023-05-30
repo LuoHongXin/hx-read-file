@@ -13,6 +13,19 @@ const os = require('os') // os.EOL 换行符常量
  * @param {*} includeSuffix 只读取哪些后缀的文件 输出的文件名
  */
 function fileDisplay(filePath, outputName, includeSuffix) {
+  if (fs.existsSync(outputName)) {
+    // 先删除文件
+    fs.unlink(outputName, (err) => {
+      if (err) throw err;
+      console.log(`旧的 ${outputName} 文件已删除`);
+      startRead(filePath, outputName, includeSuffix)
+    });
+  } else {
+    startRead(filePath, outputName, includeSuffix)
+  }
+}
+// 开始读取文件
+function startRead(filePath, outputName, includeSuffix) {
   //根据文件路径读取文件，返回文件列表
   fs.readdir(filePath, function (err, files) {
     if (err) {
@@ -25,7 +38,7 @@ function fileDisplay(filePath, outputName, includeSuffix) {
         //根据文件路径获取文件信息，返回一个fs.Stats对象
         fs.stat(filedir, async function (eror, stats) {
           if (eror) {
-            console.warn('获取文件stats失败');
+            console.warn('文件路径不正确，获取文件stats失败');
           } else {
             var isFile = stats.isFile();//是文件
             var isDir = stats.isDirectory();//是文件夹
@@ -85,7 +98,7 @@ function readFile(file, fileName) {
           })
           if (fileStr) {
             // 含有中文的写入读取的文件地址
-            await writeFile(file + os.EOL + fileStr + os.EOL, fileName)
+            await writeFile(file + os.EOL + fileStr + os.EOL, file, fileName)
           } else {
             res()
           }
@@ -97,8 +110,10 @@ function readFile(file, fileName) {
   })
 }
 
+
+
 // 写入文件内容
-function writeFile(str, file) {
+function writeFile(str, filePath, file) {
   return new Promise(res => {
     if (!file) file = "output.txt"
     // 把中文转换成字节数组
@@ -107,9 +122,9 @@ function writeFile(str, file) {
     // 如果用writeFile，那么会删除旧文件，直接写新文件
     fs.appendFile(file, arr, function (err) {
       if (err)
-        console.log("fail " + err);
+        console.log("写入文件失败：" + filePath + err);
       else
-        console.log("写入文件ok");
+        console.log("写入文件成功：" + filePath);
       res()
     });
   })

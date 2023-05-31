@@ -3,8 +3,8 @@ const OpenCC = require('node-opencc');
 /*
   读取路径下的所有文件内容，抽取中文输出
 */
-var fs = require('fs');
-var path = require('path');
+let fs = require('fs');
+let path = require('path');
 const os = require('os') // os.EOL 换行符常量
 /**
  * @description
@@ -15,55 +15,84 @@ const os = require('os') // os.EOL 换行符常量
  */
 // 开始读取文件
 function transToHongKong(filePath, includeSuffix, prefixPath = './') {
-    if (prefixPath !== './') prefixPath += '/'
-    //根据文件路径读取文件，返回文件列表
-    fs.readdir(filePath, function (err, files) {
-        if (err) {
-            console.warn(err)
-        } else {
-            //遍历读取到的文件列表
-            files.forEach(function (filename) {
-                //获取当前文件的绝对路径
-                var filedir = path.join(filePath, filename);
-                //根据文件路径获取文件信息，返回一个fs.Stats对象
-                fs.stat(filedir, async function (eror, stats) {
-                    if (eror) {
-                        console.warn('文件路径不正确，获取文件stats失败');
-                    } else {
-                        var isFile = stats.isFile();//是文件
-                        var isDir = stats.isDirectory();//是文件夹
-                        let pathName = prefixPath + filename;
-                        if (isFile) {
-                            // 符合后缀的文件才读取 && filedir.indexOf("src") > -1
-                            const nameSplit = filename.split(".")
-                            const suffix = nameSplit[nameSplit.length - 1]; // 文件后缀
-                            if (fs.existsSync(pathName)) {
-                                pathName = prefixPath + '_new' + filename
-                            }
-                            if (includeSuffix) {
-                                for (let index = 0; index < includeSuffix.length; index++) {
-                                    const targetSuffix = includeSuffix[index];
-                                    if (targetSuffix === suffix) {
+    if (fs.existsSync(filePath)) {
+        const stat = fs.statSync(filePath);
+        if (prefixPath !== './') prefixPath += '/'
+        // 路径为文件夹
+        if (stat.isDirectory()) {
+            //根据文件路径读取文件列表，返回文件列表
+            fs.readdir(filePath, function (err, files) {
+                if (err) {
+                    console.warn(err)
+                } else {
+                    //遍历读取到的文件列表
+                    files.forEach(function (filename) {
+                        //获取当前文件的绝对路径
+                        let filedir = path.join(filePath, filename);
+                        //根据文件路径获取文件信息，返回一个fs.Stats对象
+                        fs.stat(filedir, async function (eror, stats) {
+                            if (eror) {
+                                console.warn('文件路径不正确，获取文件stats失败');
+                            } else {
+                                let isFile = stats.isFile();//是文件
+                                let isDir = stats.isDirectory();//是文件夹
+                                let pathName = prefixPath + filename;
+                                if (isFile) {
+                                    // 符合后缀的文件才读取
+                                    const nameSplit = filename.split(".")
+                                    const suffix = nameSplit[nameSplit.length - 1]; // 文件后缀
+                                    if (fs.existsSync(pathName)) {
+                                        pathName = prefixPath + '_new' + filename
+                                    }
+                                    if (includeSuffix) {
+                                        for (let index = 0; index < includeSuffix.length; index++) {
+                                            const targetSuffix = includeSuffix[index];
+                                            if (targetSuffix === suffix) {
+                                                await readFile(filedir, pathName)
+                                            }
+                                        }
+                                    } else {
                                         await readFile(filedir, pathName)
                                     }
                                 }
-                            } else {
-                                await readFile(filedir, pathName)
+                                if (isDir) {
+                                    if (filedir.indexOf("node_modules") > -1) return; // node_modules 不用遍历访问
+                                    transToHongKong(filedir, includeSuffix, pathName);//递归，如果是文件夹，就继续遍历该文件夹下面的文件
+                                }
                             }
-                        }
-                        if (isDir) {
-                            if (filedir.indexOf("node_modules") > -1) return; // node_modules 不用遍历访问
-                            transToHongKong(filedir, includeSuffix, pathName);//递归，如果是文件夹，就继续遍历该文件夹下面的文件
-                        }
-                    }
-                })
+                        })
+                    });
+                }
             });
+        } else if (stat.isFile()) {
+            let filename = path.basename(filePath)
+            // 符合后缀的文件才读取
+            const nameSplit = filename.split(".")
+            const suffix = nameSplit[nameSplit.length - 1]; // 文件后缀
+            if (fs.existsSync(filename)) {
+                filename = 'new_' + filename
+            }
+            if (includeSuffix) {
+                for (let index = 0; index < includeSuffix.length; index++) {
+                    const targetSuffix = includeSuffix[index];
+                    if (targetSuffix === suffix) {
+                        readFile(filePath, filename)
+                    }
+                }
+            } else {
+                readFile(filePath, filename)
+            }
+        } else {
+            console.log(`${filePath}不存在`);
         }
-    });
+    } else {
+        console.log(`${filePath}不存在`);
+    }
+
 }
 
 // 加载编码转换模块
-var iconv = require('iconv-lite');
+let iconv = require('iconv-lite');
 // 读取文件内容
 function readFile(file, filename) {
     return new Promise(res => {
@@ -87,7 +116,7 @@ function readFile(file, filename) {
                     })
                     newArr.forEach(str => {
                         fileStr = fileStr + os.EOL + str;
-                        var reg = new RegExp(str, 'ig');
+                        let reg = new RegExp(str, 'ig');
                         data = data.replace(reg, OpenCC.simplifiedToHongKong(str))
                     })
                     if (fileStr) {
@@ -111,7 +140,7 @@ function writeFile(str, file) {
     return new Promise(res => {
         if (!file) file = "output.txt"
         // 把中文转换成字节数组
-        var arr = iconv.encode(str + os.EOL, "utf-8");
+        let arr = iconv.encode(str + os.EOL, "utf-8");
         const dirPath = file.split('/').slice(0, -1).join('/'); // 获取目录路径
         // appendFile，如果文件不存在，会自动创建新文件
         // 如果用writeFile，那么会删除旧文件，直接写新文件

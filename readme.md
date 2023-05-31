@@ -1,6 +1,6 @@
 ## 安装
 ```
-npm install hxi18nread -g
+npm install hxread -g
 ```
 ## 使用
 ### 读取目标路径下文件内容的中文

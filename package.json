@@ -1,6 +1,6 @@
 {
-  "name": "hxi18nread",
-  "version": "0.0.6",
+  "name": "hxread",
+  "version": "0.0.7",
   "description": "中文项目国际化时相关的脚本",
   "main": "main.js",
   "bin": {

@@ -96,51 +96,82 @@ function checkFile(filePath, targetObj, outputName, includeSuffix) {
   let timer = setTimeout(timeExcute, 5 * 1000)
   // 遍历递归读取文件夹路径
   function fileDisplay(filePath) {
-    //根据文件路径读取文件，返回文件列表
-    fs.readdir(filePath, function (err, files) {
-      if (err) {
-        console.warn(err)
-      } else {
-        //遍历读取到的文件列表
-        files.forEach(function (filename) {
-          //获取当前文件的绝对路径
-          var filedir = path.join(filePath, filename);
-          //根据文件路径获取文件信息，返回一个fs.Stats对象
-          fs.stat(filedir, async function (eror, stats) {
-            if (eror) {
-              console.warn('获取文件stats失败');
-            } else {
-              var isFile = stats.isFile();//是文件
-              var isDir = stats.isDirectory();//是文件夹
-              if (isFile) {
-                // 符合后缀的文件才读取
-                const nameSplit = filename.split(".")
-                const suffix = nameSplit[nameSplit.length - 1]; // 文件后缀
-                if (includeSuffix) {
-                  for (let index = 0; index < includeSuffix.length; index++) {
-                    const targetSuffix = includeSuffix[index];
-                    if (targetSuffix === suffix) {
+    if (fs.existsSync(filePath)) {
+      const stat = fs.statSync(filePath);
+      if (stat.isDirectory()) {
+        //根据文件路径读取文件，返回文件列表
+        fs.readdir(filePath, function (err, files) {
+          if (err) {
+            console.warn(err)
+          } else {
+            //遍历读取到的文件列表
+            files.forEach(function (filename) {
+              //获取当前文件的绝对路径
+              var filedir = path.join(filePath, filename);
+              //根据文件路径获取文件信息，返回一个fs.Stats对象
+              fs.stat(filedir, async function (eror, stats) {
+                if (eror) {
+                  console.warn('获取文件stats失败');
+                } else {
+                  var isFile = stats.isFile();//是文件
+                  var isDir = stats.isDirectory();//是文件夹
+                  if (isFile) {
+                    // 符合后缀的文件才读取
+                    const nameSplit = filename.split(".")
+                    const suffix = nameSplit[nameSplit.length - 1]; // 文件后缀
+                    if (includeSuffix) {
+                      for (let index = 0; index < includeSuffix.length; index++) {
+                        const targetSuffix = includeSuffix[index];
+                        if (targetSuffix === suffix) {
+                          await readFile(filedir, outputName)
+                          numIndex++;
+                          console.log(`校验文件${numIndex}...`);
+                          isDone = false;
+                        }
+                      }
+                    } else {
                       await readFile(filedir, outputName)
                       numIndex++;
                       console.log(`校验文件${numIndex}...`);
                       isDone = false;
                     }
                   }
-                } else {
-                  await readFile(filedir, outputName)
-                  numIndex++;
-                  console.log(`校验文件${numIndex}...`);
-                  isDone = false;
+                  if (isDir) {
+                    fileDisplay(filedir);//递归，如果是文件夹，就继续遍历该文件夹下面的文件
+                  }
                 }
-              }
-              if (isDir) {
-                fileDisplay(filedir);//递归，如果是文件夹，就继续遍历该文件夹下面的文件
-              }
-            }
-          })
+              })
+            });
+          }
         });
+      } else if (stat.isFile()) {
+        let filename = path.basename(filePath)
+        // 符合后缀的文件才读取
+        const nameSplit = filename.split(".")
+        const suffix = nameSplit[nameSplit.length - 1]; // 文件后缀
+        if (includeSuffix) {
+          for (let index = 0; index < includeSuffix.length; index++) {
+            const targetSuffix = includeSuffix[index];
+            if (targetSuffix === suffix) {
+              readFile(filePath, outputName)
+              numIndex++;
+              console.log(`校验文件${numIndex}...`);
+              isDone = false;
+            }
+          }
+        } else {
+          readFile(filePath, outputName)
+          numIndex++;
+          console.log(`校验文件${numIndex}...`);
+          isDone = false;
+        }
+      } else {
+        console.log(`${filePath}不存在`);
       }
-    });
+
+    } else {
+      console.log(`${filePath}不存在`);
+    }
   }
   function timeExcute() {
     if (isDone) {

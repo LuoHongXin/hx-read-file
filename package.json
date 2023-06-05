@@ -1,6 +1,6 @@
 {
   "name": "hxread",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "中文项目国际化时相关的脚本",
   "main": "main.js",
   "bin": {

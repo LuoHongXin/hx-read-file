@@ -1,5 +1,4 @@
 const OpenCC = require('node-opencc');
-
 /*
   读取路径下的所有文件内容，抽取中文输出
 */
@@ -100,40 +99,13 @@ function readFile(file, filename) {
             if (err)
                 console.log("读取文件fail " + err);
             else {
-                // 读取成功时
-                // 输出字节数组
-                // 写入匹配中文正则的字符串
-                // const arr = data.match(/[\u4E00-\u9FA5\uF900-\uFA2D]+/g)
-                const arr = data.match(/(?![0-9a-zA-Z]+$)[\u4E00-\u9FA5\uF900-\uFA2D，。？！；：“”‘’（）【】《》]+[0-9A-Za-z\s|\u3002|\uff1f|\uff01|\uff0c|\u3001|\uff1b|\uff1a|\u201c|\u201d|\u2018|\u2019|\uff08|\uff09|\u300a|\u300b|\u3008|\u3009|\u3010|\u3011|\u300e|\u300f|\u300c|\u300d|\ufe43|\ufe44|\u3014|\u3015|\u2026|\u2014|\uff5e|\ufe4f|\uffe5]*[\u4E00-\u9FA5\uF900-\uFA2D，。？！；：“”‘’（）【】《》]+/g)
-                if (arr && arr.length > 0) {
-                    const newArr = []
-                    let fileStr = ""
-                    // 去重
-                    arr.forEach(str => {
-                        if (!newArr.includes(str)) {
-                            newArr.push(str);
-                        }
-                    })
-                    newArr.forEach(str => {
-                        fileStr = fileStr + os.EOL + str;
-                        let reg = new RegExp(str, 'ig');
-                        data = data.replace(reg, OpenCC.simplifiedToHongKong(str))
-                    })
-                    if (fileStr) {
-                        // 含有中文的写入读取的文件地址
-                        await writeFile(data, filename)
-                    } else {
-                        res()
-                    }
-                } else {
-                    res()
-                }
+                data = OpenCC.simplifiedToHongKong(data);
+                await writeFile(data, filename)
+                res();
             }
         });
     })
 }
-
-
 
 // 写入文件内容
 function writeFile(str, file) {

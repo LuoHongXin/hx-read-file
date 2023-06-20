@@ -1,5 +1,5 @@
 /*
-  读取angular项目的js和html，过滤被注释或未使用的国际化
+  读取目标文件，过滤被注释或未使用的国际化
 */
 var path = require('path');
 var fs = require('fs');

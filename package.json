@@ -1,6 +1,6 @@
 {
   "name": "hxread",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "中文项目国际化时相关的脚本",
   "main": "main.js",
   "bin": {
@@ -11,6 +11,7 @@
     "fileDisplay.js",
     "checkFile.js",
     "transToHongKong.js",
+    "transVar.js",
     "main.js"
   ],
   "scripts": {

@@ -26,6 +26,7 @@
   "dependencies": {
     "iconv-lite": "^0.6.3",
     "node-opencc": "^2.0.1",
-    "uglify-js": "^3.17.4"
+    "uglify-js": "^3.17.4",
+    "xlsx": "^0.18.5"
   }
 }

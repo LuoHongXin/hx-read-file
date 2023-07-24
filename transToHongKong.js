@@ -2,8 +2,10 @@ const OpenCC = require('node-opencc');
 /*
   读取路径下的所有文件内容，抽取中文输出
 */
-let fs = require('fs');
-let path = require('path');
+const fs = require('fs');
+const PizZip = require("pizzip");
+const Docxtemplater = require("docxtemplater");
+const path = require('path');
 const os = require('os') // os.EOL 换行符常量
 /**
  * @description
@@ -94,16 +96,37 @@ function transToHongKong(filePath, includeSuffix, prefixPath = './') {
 let iconv = require('iconv-lite');
 // 读取文件内容
 function readFile(file, filename) {
+    console.log(filename, 6666);
     return new Promise(res => {
-        fs.readFile(file, "utf8", async function (err, data) {
-            if (err)
-                console.log("读取文件fail " + err);
-            else {
-                data = OpenCC.simplifiedToHongKong(data);
-                await writeFile(data, filename)
-                res();
-            }
-        });
+        const arr = filename.split(".");
+        if (arr[arr.length - 1] === "docx") {
+            // 读取docx文件
+            const content = fs.readFileSync("./aaa.docx", "binary");
+            const zip = new PizZip(content);
+            // 初始化 Docxtemplater
+            const doc = new Docxtemplater(zip, {
+                paragraphLoop: true,
+                linebreaks: true,
+            });
+            // 获取docx文档的内容
+            const contentXml = doc.getZip().file("word/document.xml").asText();
+            // 清除原始文本内容并替换为新内容
+            const updatedContent = OpenCC.simplifiedToHongKong(contentXml);
+            // 获取渲染后的内容
+            const updatedFile  = doc.getZip().file("word/document.xml", updatedContent).generate({ type: "nodebuffer" });
+            // 将渲染后的内容写入新文件
+            fs.writeFileSync(filename, updatedFile);
+        } else {
+            fs.readFile(file, "utf8", async function (err, data) {
+                if (err)
+                    console.log("读取文件fail " + err);
+                else {
+                    data = OpenCC.simplifiedToHongKong(data);
+                    await writeFile(data, filename)
+                    res();
+                }
+            });
+        }
     })
 }
 

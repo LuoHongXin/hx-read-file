@@ -1,15 +1,21 @@
-const cn = require("./cn");
-const en = require("./en");
 // 迭代对象
 function generateObj(obj1, obj2, str) {
     for (let key in obj1) {
         let isChange = false
+        if (typeof obj2[key] !== typeof obj1[key]) {
+            console.log("两个对象的 " + key + " 值类型不一致");
+            continue;
+        }
+        if (!obj2[key]) {
+            console.log("英文对象的 " + key + " 值不存在");
+            continue;
+        }
+        if (!obj1[key]) {
+            console.log("中文对象的 " + key + " 值不存在");
+            continue;
+        }
         if (typeof obj1[key] === 'object') {
-            if (typeof obj2[key] !== 'object') {
-                console.log("两个对象的 " + key + " 不一致");
-                continue;
-            }
-            str = generateObj(obj1[key], obj2[key]);
+            str = generateObj(obj1[key], obj2[key], str);
             continue;
         }
         // 中文最后是句号，但英文却没有英文点则补充
@@ -32,7 +38,7 @@ function generateObj(obj1, obj2, str) {
 function momdifyStr(key, str, newStr) {
     // 使用正则表达式匹配对象的value值，并添加句号
     // const regex = /(\s*[^:]+:\s*)["']([^"]+)["']/g;
-    const regex = new RegExp(`(\s*${key}\s*:\s*)["']([^"]+)["']`, "g")
+    const regex = new RegExp(`(\s*${key}\s*:\s*)(["'])([^"]+)\\2`, "g")
     return str.replace(regex, function (match, $1, $2) {
         return $1 + `"${newStr}"`
     });

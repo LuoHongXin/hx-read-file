@@ -1,7 +1,7 @@
 // 迭代对象
 function generateObj(obj1, obj2, str) {
     for (let key in obj1) {
-        let isChange = false
+        let newStr = ""
         if (typeof obj2[key] !== typeof obj1[key]) {
             console.log("两个对象的 " + key + " 值类型不一致");
             continue;
@@ -20,26 +20,24 @@ function generateObj(obj1, obj2, str) {
         }
         // 中文最后是句号，但英文却没有英文点则补充
         if (obj1[key].slice(-1) === "。" && obj2[key].slice(-1) !== ".") {
-            obj2[key] += "."
-            isChange = true
+            newStr = obj2[key] + "."
 
         }
         // 中文最后不是句号，但英文却有英文点则去掉
         else if (obj1[key].slice(-1) !== "。" && obj2[key].slice(-1) === ".") {
-            obj2[key] = obj2[key].slice(0, -1)
-            isChange = true
+            newStr = obj2[key].slice(0, -1)
         }
-        if (isChange) {
-            str = momdifyStr(key, str, obj2[key])
+        if (newStr) {
+            str = momdifyStr(key, str, obj2[key], newStr)
         }
     }
     return str;
 }
-function momdifyStr(key, str, newStr) {
+function momdifyStr(key, str, oldStr, newStr) {
     // 使用正则表达式匹配对象的value值，并添加句号
     // const regex = /(\s*[^:]+:\s*)["']([^"]+)["']/g;
-    const regex = new RegExp(`(\s*${key}\s*:\s*)(["'])([^"]+)\\2`, "g")
-    return str.replace(regex, function (match, $1, $2) {
+    // const regex = new RegExp(`(\s*${key}\s*:\s*)(["'])([^"]+)\\2`, "g")
+    return str.replace(oldStr, function (match, $1, $2) {
         return $1 + `"${newStr}"`
     });
 }

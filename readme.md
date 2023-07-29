@@ -25,6 +25,11 @@ hxread --hk [读取文件的路径] [支持读取文件的后缀]
 hxread --transObj [必填，翻译好的xlsx文件的路径] sheetName [读取所在sheet名称] cnName [必填，中文列名] enName [必填，英文列名] sheetIndex [读取所在sheet下标] only['cn':只输出中文,'en':只输出英文,默认'all']
 ```
 
+### 根据中文翻译对象的值是否有句号，判断对应英文翻译对象翻译是否有英文点。
+```
+hxread --checkStop [中文翻译对象的路径] [英文翻译对象的翻译]
+```
+
 ### 读取项目中的中文
 - 把项目中的国际化中文给注释掉，例如：
 ```js

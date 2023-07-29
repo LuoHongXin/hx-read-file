@@ -5,6 +5,7 @@ const fileDisplay = require("./fileDisplay");
 const checkFile = require("./checkFile");
 const transToHongKong = require("./transToHongKong");
 const transVar = require("./transVar");
+const checkFullStop = require("./checkFullStop");
 const argv = process.argv.slice(2);
 const package = require("./package.json")
 // 版本号
@@ -61,6 +62,9 @@ if (isPath(argv[0])) {
         includeSuffix = argv[2].split(",")
     }
     transToHongKong(argv[1], includeSuffix)
+} else if (argv[0] === '--checkStop') {
+    // 根据中文句号，判断对应英文句子是否需要英文点
+    checkFullStop(argv[1], argv[2])
 } else if (argv[0] === '--transObj') {
     /**
     * 读取翻译好的xlsx文件（含中英文），根据翻译后的英文生成变量，输出中文和英文的js对象

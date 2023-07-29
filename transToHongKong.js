@@ -96,7 +96,6 @@ function transToHongKong(filePath, includeSuffix, prefixPath = './') {
 let iconv = require('iconv-lite');
 // 读取文件内容
 function readFile(file, filename) {
-    console.log(filename, 6666);
     return new Promise(res => {
         const arr = filename.split(".");
         if (arr[arr.length - 1] === "docx") {

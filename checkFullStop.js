@@ -38,7 +38,8 @@ function momdifyStr(key, str, oldStr, newStr) {
     // const regex = /(\s*[^:]+:\s*)["']([^"]+)["']/g;
     // const regex = new RegExp(`(\s*${key}\s*:\s*)(["'])([^"]+)\\2`, "g")
     return str.replace(oldStr, function (match, $1, $2) {
-        return $1 + `"${newStr}"`
+        // return $1 + `"${newStr}"`
+        return newStr
     });
 }
 

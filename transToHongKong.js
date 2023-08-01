@@ -100,7 +100,7 @@ function readFile(file, filename) {
         const arr = filename.split(".");
         if (arr[arr.length - 1] === "docx") {
             // 读取docx文件
-            const content = fs.readFileSync("./aaa.docx", "binary");
+            const content = fs.readFileSync(file, "binary");
             const zip = new PizZip(content);
             // 初始化 Docxtemplater
             const doc = new Docxtemplater(zip, {

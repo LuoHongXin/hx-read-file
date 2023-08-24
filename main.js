@@ -30,6 +30,10 @@ if (argv[0] === '--help' || argv[0] === '-help') {
     console.log('\x1b[32m```\x1b[0m');
     console.log('\x1b[1m\x1b[32mhxread --transObj [必填，翻译好的xlsx文件的路径] sheetName [读取所在sheet名称] cnName [必填，中文列名] enName [必填，英文列名] sheetIndex [读取所在sheet下标] only[cn:只输出中文,en:只输出英文,默认all]\x1b[0m');
     console.log('\x1b[32m```\x1b[0m');
+    console.log('\x1b[32m5、根据中文翻译对象的值是否有句号，判断对应英文翻译对象翻译是否有英文点：\x1b[0m');
+    console.log('\x1b[32m```\x1b[0m');
+    console.log('\x1b[1m\x1b[32mhxread --checkStop [中文翻译对象的路径] [英文翻译对象的翻译]\x1b[0m');
+    console.log('\x1b[32m```\x1b[0m');
     console.log('\x1b[32m额外提示：\x1b[0m');
     console.log('\x1b[32m读取文件的路径: 会遍历递归读取路径上的所有文件\x1b[0m');
     console.log('\x1b[32m国际化文件的路径，国际化一般就是导出一个对象，可为json文件或js文件，js文件需要module.exports导出\x1b[0m');
